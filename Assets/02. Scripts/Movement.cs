@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
+using Photon.Pun;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
@@ -13,6 +15,11 @@ public class Movement : MonoBehaviour
     private Ray ray;
     private Vector3 hitPoint;
 
+    // 포톤뷰 컴포넌트 캐시 처리
+    private PhotonView pv;
+
+    private CinemachineVirtualCamera cinemachineVirtualCamera;
+
     public float moveSpeed = 10.0f;
     void Start()
     {
@@ -21,14 +28,25 @@ public class Movement : MonoBehaviour
         playerAnim = GetComponent<Animator>();
         camera = Camera.main;
 
+        pv = GetComponent<PhotonView>();
+        cinemachineVirtualCamera = GameObject.FindObjectOfType<CinemachineVirtualCamera>();
+        if(pv.IsMine)
+        {
+            cinemachineVirtualCamera.Follow = transform;
+            cinemachineVirtualCamera.LookAt = transform;
+        }
+
         // Player 아래 가상 바닥 생성
         plane = new Plane(transform.up, transform.position);
     }
 
     void Update()
     {
-        Move();
-        Turn();
+        if(pv.IsMine)
+        {
+            Move();
+            Turn();
+        }
     }
 
     float h => Input.GetAxis("Horizontal");

@@ -70,5 +70,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         {
             Debug.Log($"{player.Value.NickName} , {player.Value.ActorNumber}");
         }
+
+        // PhotonNetword 동기화 상태로 Player 생성
+        Transform[] spawnPoints = GameObject.Find("SpawnPoints").GetComponentsInChildren<Transform>();
+        int idx = Random.Range(1, spawnPoints.Length);
+        PhotonNetwork.Instantiate("Player", spawnPoints[idx].position, spawnPoints[idx].rotation, 0);
     }
 }
