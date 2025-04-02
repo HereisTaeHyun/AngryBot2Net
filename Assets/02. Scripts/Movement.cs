@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
-public class Movement : MonoBehaviour
+public class Movement : MonoBehaviourPunCallbacks, IPunObservable
 {
     private CharacterController characterController;
     private new Transform transform;
@@ -21,6 +22,10 @@ public class Movement : MonoBehaviour
     private CinemachineVirtualCamera cinemachineVirtualCamera;
 
     public float moveSpeed = 10.0f;
+
+    private Vector3 receivePos;
+    private Quaternion receiveRot;
+    public float damping = 10.0f;
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -46,6 +51,12 @@ public class Movement : MonoBehaviour
         {
             Move();
             Turn();
+        }
+        // 타인이라면 수신 처리
+        else if (!photonView.IsMine)
+        {
+            transform.position = Vector3.Lerp(transform.position, receivePos, Time.deltaTime * 10f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, receiveRot, Time.deltaTime * 10f);
         }
     }
 
@@ -87,5 +98,21 @@ public class Movement : MonoBehaviour
         Vector3 lookDir = hitPoint - transform.position;
         lookDir.y = 0;
         transform.localRotation = Quaternion.LookRotation(lookDir);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        // 로컬 캐릭터라면 송신
+        if(stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        // 아니라면 수신
+        else
+        {
+            receivePos = (Vector3)stream.ReceiveNext();
+            receiveRot = (Quaternion)stream.ReceiveNext();
+        }
     }
 }

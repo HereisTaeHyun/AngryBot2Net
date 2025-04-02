@@ -24028,8 +24028,8 @@ GameObject:
   - component: {fileID: 693336395925195844}
   - component: {fileID: 693336394546843774}
   - component: {fileID: 693336394546843773}
-  - component: {fileID: 693336394546843747}
-  - component: {fileID: 693336394546843772}
+  - component: {fileID: -2908727952479816003}
+  - component: {fileID: -4681324163643797038}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -24109,6 +24109,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
+  damping: 0
 --- !u!114 &693336394546843773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24124,16 +24125,15 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 3
+  Synchronization: 1
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 693336394546843747}
-  - {fileID: 693336394546843772}
+  - {fileID: 693336394546843774}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &693336394546843747
+--- !u!114 &-2908727952479816003
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -24142,14 +24142,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5649813464381804573}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Script: {fileID: 11500000, guid: edb0a58ed874f534abc8ebe7b38fb1a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
---- !u!114 &693336394546843772
+  firePos: {fileID: 693336396023753598}
+  bulletPrefab: {fileID: 8222332823237018225, guid: bbfb9a20b68ab4c3f830a9872b675b34, type: 3}
+--- !u!114 &-4681324163643797038
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -24158,30 +24156,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5649813464381804573}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Script: {fileID: 11500000, guid: dbdea47b6ba9b4f4a9b68dd082357b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowLayerWeightsInspector: 1
-  ShowParameterInspector: 1
-  m_SynchronizeParameters:
-  - Type: 4
-    SynchronizeType: 1
-    Name: IsWalking
-  - Type: 1
-    SynchronizeType: 1
-    Name: Forward
-  - Type: 1
-    SynchronizeType: 1
-    Name: Strafe
-  - Type: 9
-    SynchronizeType: 1
-    Name: Die
-  - Type: 4
-    SynchronizeType: 1
-    Name: Respawn
-  m_SynchronizeLayers:
-  - SynchronizeType: 1
-    LayerIndex: 0
+  currHP: 100
 --- !u!1 &5649813464381804577
 GameObject:
   m_ObjectHideFlags: 0
