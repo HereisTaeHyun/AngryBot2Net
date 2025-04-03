@@ -4,12 +4,17 @@ using Photon.Pun;
 using Photon.Realtime;
 using Photon.Pun.Demo.Cockpit;
 using UnityEngine;
+using TMPro;
 
 public class PhotonManager : MonoBehaviourPunCallbacks
 {
     // 버전, 유저 ID
     private readonly string version = "1.0";
     private string userId = "KTH";
+
+    public TMP_InputField userIF;
+    public TMP_InputField roomNameIF;
+
     void Awake()
     {
         // 마스터 클라이언트 씬 자동 동기화 옵션
@@ -26,6 +31,36 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();
     }
 
+    void Start()
+    {
+        userId = PlayerPrefs.GetString("USER_ID", $"USER_{Random.Range(1, 21):0}");
+        userIF.text = userId;
+        PhotonNetwork.NickName = userId;
+    }
+
+    public void SetUserId()
+    {
+        if(string.IsNullOrEmpty(userIF.text))
+        {
+            userId = $"USER_{Random.Range(1, 21):0}";
+        }
+        else
+        {
+            userId = userIF.text;
+        }
+        PlayerPrefs.SetString("USER_ID", userId);
+        PhotonNetwork.NickName = userId;
+    }
+
+    private string SetRoomName()
+    {
+        if(string.IsNullOrEmpty(roomNameIF.text))
+        {
+            roomNameIF.text = $"ROOM_{Random.Range(1, 101):000}";
+        }
+        return roomNameIF.text;
+    }
+
     // 포톤 서버 접속 후 가장 먼저 호출되는 콜백
     public override void OnConnectedToMaster()
     {
@@ -40,19 +75,20 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         Debug.Log($"PhotonNetwork.InLobby : {PhotonNetwork.InLobby}");
-        PhotonNetwork.JoinRandomRoom();
+        // PhotonNetwork.JoinRandomRoom();
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         Debug.Log($"Join Random Filed {returnCode} : {message}");
+        OnMakeRoomClick();
 
         // 룸 속성 정의 및 생성
-        RoomOptions ro = new RoomOptions();
-        ro.MaxPlayers = 20;
-        ro.IsOpen = true;
-        ro.IsVisible = true;
-        PhotonNetwork.CreateRoom("New Room", ro);
+        // RoomOptions ro = new RoomOptions();
+        // ro.MaxPlayers = 20;
+        // ro.IsOpen = true;
+        // ro.IsVisible = true;
+        // PhotonNetwork.CreateRoom("New Room", ro);
     }
 
     public override void OnCreatedRoom()
@@ -72,8 +108,31 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         }
 
         // PhotonNetword 동기화 상태로 Player 생성
-        Transform[] spawnPoints = GameObject.Find("SpawnPoints").GetComponentsInChildren<Transform>();
-        int idx = Random.Range(1, spawnPoints.Length);
-        PhotonNetwork.Instantiate("Player", spawnPoints[idx].position, spawnPoints[idx].rotation, 0);
+        // Transform[] spawnPoints = GameObject.Find("SpawnPoints").GetComponentsInChildren<Transform>();
+        // int idx = Random.Range(1, spawnPoints.Length);
+        // PhotonNetwork.Instantiate("Player", spawnPoints[idx].position, spawnPoints[idx].rotation, 0);
+
+        if(PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("BattleField");
+        }
     }
+#region UI Button Event
+    public void OnLoginClick()
+    {
+        SetUserId();
+        PhotonNetwork.JoinRandomRoom();
+    }
+    public void OnMakeRoomClick()
+    {
+        SetUserId();
+
+        // 룸 속성 정의 및 생성
+        RoomOptions ro = new RoomOptions();
+        ro.MaxPlayers = 20;
+        ro.IsOpen = true;
+        ro.IsVisible = true;
+        PhotonNetwork.CreateRoom(SetRoomName(), ro);
+    }
+#endregion
 }
