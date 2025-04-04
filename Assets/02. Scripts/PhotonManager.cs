@@ -15,6 +15,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public TMP_InputField userIF;
     public TMP_InputField roomNameIF;
 
+    private Dictionary<string, GameObject> rooms = new Dictionary<string, GameObject>();
+    private GameObject roomItemPrefab;
+    public Transform scrollContent;
+
     void Awake()
     {
         // 마스터 클라이언트 씬 자동 동기화 옵션
@@ -26,9 +30,14 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
         // 포톤 서버와의 데이터 초당 전송 횟수
         Debug.Log(PhotonNetwork.SendRate);
+        
+        roomItemPrefab = Resources.Load<GameObject>("RoomItem");
 
         // 포톤 서버 접속
-        PhotonNetwork.ConnectUsingSettings();
+        if(PhotonNetwork.IsConnected == false)
+        {
+            PhotonNetwork.ConnectUsingSettings();
+        }
     }
 
     void Start()
@@ -134,5 +143,38 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         ro.IsVisible = true;
         PhotonNetwork.CreateRoom(SetRoomName(), ro);
     }
-#endregion
+
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        // 삭제룸 프리펩 저장 변수
+        GameObject tempRoom = null;
+        foreach(var roomInfo in roomList)
+        {
+            // 룸이 삭제된 경우
+            if(roomInfo.RemovedFromList == true)
+            {
+                // 룸 이름 검색하여 저장된 프리펩 추출   
+                rooms.TryGetValue(roomInfo.Name, out tempRoom);
+                Destroy(tempRoom);
+                rooms.Remove(roomInfo.Name);
+            }
+            else
+            {
+                // 룸이 딕셔너리에 없으면 추가
+                if(rooms.ContainsKey(roomInfo.Name) == false)
+                {
+                    // roomInfo를 scroll 하위에 생성
+                    GameObject roomPrefab = Instantiate(roomItemPrefab, scrollContent);
+                    roomPrefab.GetComponent<RoomData>().RoomInfo = roomInfo;
+                    rooms.Add(roomInfo.Name, roomPrefab);
+                }
+                else
+                {
+                    rooms.TryGetValue(roomInfo.Name, out tempRoom);
+                    tempRoom.GetComponent<RoomData>().RoomInfo = roomInfo;
+                }
+            }
+        }
+    }
+    #endregion
 }
